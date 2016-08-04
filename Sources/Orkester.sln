@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orkester", "Orkester\Orkester.csproj", "{C041E332-2911-46C4-A67E-42D827034AD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orkester.Tests", "Orkester.Tests\Orkester.Tests.csproj", "{6ED8CAC4-A81D-4D03-9EF5-BE7F2E51C2A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orkester.Sample", "Orkester.Sample\Orkester.Sample.csproj", "{F39CB355-1B93-4054-BBD9-A53841237162}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C041E332-2911-46C4-A67E-42D827034AD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C041E332-2911-46C4-A67E-42D827034AD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C041E332-2911-46C4-A67E-42D827034AD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C041E332-2911-46C4-A67E-42D827034AD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ED8CAC4-A81D-4D03-9EF5-BE7F2E51C2A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ED8CAC4-A81D-4D03-9EF5-BE7F2E51C2A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ED8CAC4-A81D-4D03-9EF5-BE7F2E51C2A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ED8CAC4-A81D-4D03-9EF5-BE7F2E51C2A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F39CB355-1B93-4054-BBD9-A53841237162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F39CB355-1B93-4054-BBD9-A53841237162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F39CB355-1B93-4054-BBD9-A53841237162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F39CB355-1B93-4054-BBD9-A53841237162}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
