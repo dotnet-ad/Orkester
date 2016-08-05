@@ -185,27 +185,30 @@ Abstraction of a request is represented easily as query and each asynchronous ex
 
 ### Registration
 
-#### Task
+#### `Task`
 
 ```csharp
-Scheduler.Default.Create(async (query, ct) => { 
+Scheduler.Default.Create(async (query, ct) => 
+{ 
 	await Task.Delay(10);
 }).Save("/void");
 ```
 
-#### Task<T>
+#### `Task<T>`
 
 ```csharp
-Scheduler.Default.Create<int>(async (query, ct) => { 
+Scheduler.Default.Create<int>(async (query, ct) => 
+{ 
 	await Task.Delay(10);
 	return 5;
 }).Save("/withresult");
 ```
 
-#### Extensions
+#### Async extensions
 
 ```csharp
-Scheduler.Default.Create<int>(async (query, ct) => { 
+Scheduler.Default.Create<int>(async (query, ct) => 
+{ 
 	await Task.Delay(10);
 	return 5;
 }).WithUniqueness().Save("/unique");
@@ -213,16 +216,64 @@ Scheduler.Default.Create<int>(async (query, ct) => {
 
 ### Invocation
 
-#### Task
+#### `Task`
 
 ```csharp
 await Scheduler.Default.ExecuteAsync("/void");
 ```
 
-#### Task<T>
+#### `Task<T>`
 
 ```csharp
 var result = await Scheduler.Default.ExecuteAsync<int>("/withresult");
+```
+
+### Queries
+
+#### Send parameters
+
+To pass parameters to your operation, just append a common query string to your execution query.
+
+```csharp
+var result = await Scheduler.Default.ExecuteAsync<string>("/withresult?p1=example&p2=other&p3=7&p4=true");
+```
+
+#### Access parameters
+
+Query parameters are accessible through properties of a `dynamic` object. The parsing is made by casting the properties to one of supported types : `int`, `long`, `string`, `DateTime`, `float`, `double`, `bool`.
+
+```csharp
+Scheduler.Default.Create<string>(async (query, ct) => 
+{ 
+	var p1 = (string)query.p1;
+	var p2 = (string)query.p2;
+	var p3 = (int)query.p3;
+	var p4 = (bool)query.p4;
+	return $"{p1} {p2} {p3} {p4}";
+}).WithUniqueness().Save("/withresult");
+```
+
+#### Signature
+
+Query parameters values are part of operation signature : the async modifiers are independant for each set of query parameters (`?a=1&b=2` != `?a=2&b=1`, but `?a=1&b=2` == `?b=2&a=1`).
+
+```csharp
+var count = 0;
+
+Scheduler.Default.Create(async (query, ct) => 
+{ 
+	await Task.Delay(10);
+	count+= (int)p1 + (int)p2;
+}).WithUniqueness().Save("/add");
+
+await Scheduler.Default.ExecuteAsync("/add?p1=2&p2=1"); // + 2 + 1
+await Scheduler.Default.ExecuteAsync("/add?p2=1&p1=2"); // Identical (not executed) even if unordered
+
+await Scheduler.Default.ExecuteAsync("/add?p1=1&p2=2"); // + 1 + 2 
+await Scheduler.Default.ExecuteAsync("/add?p1=1&p2=2"); // Identical
+
+Assert.AreEqual(6,count);
+
 ```
 
 ## Roadmap / Ideas
@@ -233,7 +284,7 @@ var result = await Scheduler.Default.ExecuteAsync<int>("/withresult");
 
 ## About
 
-Feel free to add an issue or pull request if you have any idea.
+Feel free to add an issue or pull request if you have any idea or bug.
 
 ### License
 
