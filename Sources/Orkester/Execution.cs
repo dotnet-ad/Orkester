@@ -6,9 +6,8 @@
 
 	public class Execution : IExecution
 	{
-		public Execution(IOperation operation, DynamicQuery query, Task task)
+		public Execution(string query, Task task)
 		{
-			this.Operation = operation;
 			this.Query = query;
 			this.Task = task;
 			this.StartDate = DateTime.Now;
@@ -18,12 +17,7 @@
 			});
 		}
 
-		public IOperation Operation
-		{
-			get; private set;
-		}
-
-		public DynamicQuery Query
+		public string Query
 		{
 			get; private set;
 		}
@@ -43,9 +37,9 @@
 			get; private set;
 		}
 
-		public bool IsFinished
+		public Task<T> AsTask<T>()
 		{
-			get { return this.EndDate != null; }
+			return this.Task as Task<T>;
 		}
 	}
 }
