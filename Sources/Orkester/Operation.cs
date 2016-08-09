@@ -83,9 +83,9 @@
 			return PerQuery((f) => f.WithLock());
 		}
 
-		public IOperation WithMaxConcurrent(int limit)
+		public IOperation WithMaxConcurrency(int limit)
 		{
-			return PerQuery((f) => f.WithMaxConcurrent(limit));
+			return PerQuery((f) => f.WithMaxConcurrency(limit));
 		}
 
 		public IOperation WithUniqueness()

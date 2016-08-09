@@ -96,7 +96,6 @@
 		public async Task ShouldRegisterService()
 		{
 			var service = new ExampleService();
-
 			var scheduler = new Scheduler();
 			scheduler.Register(() =>  service);
 

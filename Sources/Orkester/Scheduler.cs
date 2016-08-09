@@ -14,7 +14,7 @@ namespace Orkester
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Orkester.Orkester"/> class.
 		/// </summary>
-		public Scheduler(int maxConcurent = 200)
+		public Scheduler(int maxConcurent = -1)
 		{
 			if (maxConcurent > 0)
 			{
@@ -136,7 +136,17 @@ namespace Orkester
 					{
 						var attribute = parameter.GetCustomAttribute<ParameterAttribute>();
 						var name = attribute?.Name ?? parameter.Name;
-						parameters.Add(new Tuple<string, Type>(name, parameter.ParameterType));
+						var paramType = parameter.ParameterType;
+
+						if (DynamicQuery.Parameter.IsSupported(paramType))
+						{
+							parameters.Add(new Tuple<string, Type>(name, paramType));
+						}
+						else
+						{
+							throw new InvalidOperationException($"The parameter {name} from registered service {method.DeclaringType.FullName}.{method.Name} has an unsupported type : {paramType}");
+						}
+
 					}
 
 					this.CreateMethodOperation(service, method, parameters)
@@ -194,24 +204,59 @@ namespace Orkester
 			}
 
 			// Applying modifiers from attributes to create new operations
-			foreach (var behavior in asyncMethod.GetCustomAttributes<BehaviorAttribute>()) // FIXME : preserve ordering !!!
+			foreach (var behavior in asyncMethod.GetCustomAttributes<BehaviorAttribute>().OrderBy((b) => b.Priority))
 			{
 				var behaviorType = behavior.GetType();
+
 				if (behaviorType == typeof(WithRepeatAttribute))
 				{
 					var b = behavior as WithRepeatAttribute;
 					operation = operation.WithRepeat(b.Times);
 				}
+				else if (behaviorType == typeof(WithConcurrentAttribute))
+				{
+					var b = behavior as WithConcurrentAttribute;
+					operation = operation.WithMaxConcurrency(b.Limit);
+				}
+				else if (behaviorType == typeof(WithExpirationAttribute))
+				{
+					var b = behavior as WithExpirationAttribute;
+					operation = operation.WithExpiration(b.Span);
+				}
+				else if (behaviorType == typeof(WithAggregationAttribute))
+				{
+					var b = behavior as WithAggregationAttribute;
+					operation = operation.WithAggregation(b.Span);
+				}
+				else if (behaviorType == typeof(WithTimeoutAttribute))
+				{
+					var b = behavior as WithTimeoutAttribute;
+					operation = operation.WithTimeout(b.Span);
+				}
+				else if (behaviorType == typeof(WithCurrentAttribute))
+				{
+					operation = operation.WithCurrent();
+				}
+				else if (behaviorType == typeof(WithLockAttribute))
+				{
+					operation = operation.WithLock();
+				}
 				else if (behaviorType == typeof(WithUniquenessAttribute))
 				{
 					operation = operation.WithUniqueness();
 				}
-
-				//TODO add more behaviors
+				else
+				{
+					throw new InvalidOperationException("Behavior not supported");
+				}
 			}
 
 			return operation;
 		}
+
+		#endregion
+
+		#region Execution
 
 		/// <summary>
 		/// Finds the operation from a given query.
@@ -230,10 +275,6 @@ namespace Orkester
 
 			return this.operations[path] as IOperation;
 		}
-
-		#endregion
-
-		#region Execution
 
 		public async Task<T> ExecuteAsync<T>(string query, CancellationToken token = default(CancellationToken))
 		{

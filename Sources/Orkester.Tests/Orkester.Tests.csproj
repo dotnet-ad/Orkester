@@ -43,7 +43,7 @@
     <Compile Include="DynamicQueryTests.cs" />
     <Compile Include="OperationTests.cs" />
     <Compile Include="SchedulerTests.cs" />
-    <Compile Include="AsyncExtensionsTests.cs" />
+    <Compile Include="FuncBehaviorsExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orkester\Orkester.csproj">

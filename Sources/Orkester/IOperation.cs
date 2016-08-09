@@ -1,7 +1,6 @@
 ﻿namespace Orkester
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Threading;
 	using System.Threading.Tasks;
 
@@ -21,7 +20,7 @@
 		/// </summary>
 		/// <returns>The max concurrent.</returns>
 		/// <param name="limit">Limit.</param>
-		IOperation WithMaxConcurrent(int limit);
+		IOperation WithMaxConcurrency(int limit);
 
 		/// <summary>
 		/// Only one operation's task will be executed at a given time.
