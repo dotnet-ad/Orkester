@@ -284,16 +284,24 @@ namespace Orkester
 			var dynamicQuery = new DynamicQuery(query.ExtractQueryString());
 			var task = operation.ExecuteAsync(dynamicQuery, token);
 			var execution = new Execution(query, task);
+			T result;
 
-			this.CurrentQueries.Add(execution);
+			try
+			{
+				this.CurrentQueries.Add(execution);
+				result = await execution.AsTask<T>();
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+			finally
+			{
+				this.CurrentQueries.Remove(execution);
+				if (semaphore != null) semaphore.Release();
+			}
 
-			var r = await execution.AsTask<T>();
-
-			this.CurrentQueries.Remove(execution);
-
-			if (semaphore != null)  semaphore.Release();
-
-			return r;
+			return result;
 		}
 
 		public Task ExecuteAsync(string query, CancellationToken token = default(CancellationToken))
