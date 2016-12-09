@@ -6,7 +6,28 @@ Lightweight framework for common centralized synchronization scenarios.
 
 ## Install
 
-Soon on NuGet ...
+**Support**
+
+Orkester supports  **.netstandard 1.1** and **PCL - Profile111**
+
+|Platform|Version|
+| ------------------- | :------------------: |
+|.NET Framework|4.5|
+|Windows Store|8+|
+|Windows Phone|8+|
+|Xamarin.Android|All|
+|Xamarin.iOS|All|
+|Xamarin.Mac|All|
+|Xamarin.TVOS |All|
+|Xamarin.WatchOS |All|
+
+Available on NuGet
+
+[![NuGet](https://img.shields.io/nuget/v/Xam.Plugin.Battery.svg?label=NuGet)](https://www.nuget.org/packages/Orkester/)
+
+```shell
+PM> Install-Package Orkester
+```
 
 ## Scheduler
 
@@ -156,7 +177,9 @@ var op = Scheduler.Default.Create(async (query,ct) =>
 
 ### Registration
 
-All operations must be registred into the Scheduler to be able to be queried later. To achieve this, operation's `Save` method can be used.
+#### Operation
+
+All operations must be registred into the Scheduler prior to invokation. To achieve this, operation's `Save` method can be used.
 
 ```csharp
 Scheduler.Default.Create<int>(async (query, ct) => 
@@ -166,7 +189,29 @@ Scheduler.Default.Create<int>(async (query, ct) =>
 }).WithUniqueness().Save("/name");
 ```
 
+### Groups and chains
+
+As soon as you get you operations registered, groups and chain can be registered.
+
+#### Groups
+
+A group is an operation that executes a set of other registered operations concurently.
+
+```csharp
+Scheduler.Default.Group("/op1","/op2").Save("/group");
+```
+
+#### Chain
+
+A group is an operation that executes a set of other registered operations sequencially.
+
+```csharp
+Scheduler.Default.Chain("/op1","/op2").Save("/chain");
+```
+
 ### Invocation
+
+Every registered operation can be executed from a string request containing the name/path of the operation by invoking `ExecuteAsync` method from scheduler.
 
 #### `Task`
 
@@ -190,9 +235,9 @@ To pass parameters to your operation, just append a common query string to your 
 var result = await Scheduler.Default.ExecuteAsync<string>("/withresult?p1=example&p2=other&p3=7&p4=true");
 ```
 
-#### Access parameters
+#### Parameter access
 
-Query parameters are accessible through properties of a `dynamic` object. The parsing is made by casting the properties to one of supported types : `int`, `long`, `string`, `DateTime`, `float`, `double`, `bool`.
+Query parameters are available through properties of a `dynamic` object. The parsing is made by casting a property to one of supported types : `int`, `long`, `string`, `DateTime`, `float`, `double`, `bool`.
 
 ```csharp
 Scheduler.Default.Create<string>(async (query, ct) => 
@@ -264,7 +309,7 @@ var count = await Scheduler.Default.ExecuteAsync<int>("/example/add?a=1&b=2");
 
 ## Asynchronous extensions
 
-The heart of Orkester are its set of very fluent basic extension functions for asynchronous functions. Very complex synchronization scenarios are implemented gracefuly as simple functions thanks to lambda compiled generated classes. Each one of operation behaviors can be also called from simple `Func` with extensions.
+The heart of Orkester are its set of very fluent basic extension functions for asynchronous functions. Very complex synchronization scenarios are implemented gracefuly as simple functions thanks to lambda compiled generated classes. So, each one of operation behaviors can also be invoked from simple `Func`.
 
 ```csharp
 Func<CancellationToken, Task<int>> func = async (ct) => 
@@ -284,9 +329,11 @@ var results = await re(ct); // [ 21, 21 ]
 * Add storage of operation results
 * Improve tests
 
-## About
+### Contributions
 
-Feel free to add an issue or pull request if you have any idea or found a bug.
+Contributions are welcome! If you find a bug please report it and if you want a feature please report it.
+
+If you want to contribute code please file an issue and create a branch off of the current dev branch and file a pull request.
 
 ### License
 
