@@ -1,7 +1,6 @@
 ﻿namespace Orkester
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -40,8 +39,16 @@
 
 		#region Chains and groups
 
+		/// <summary>
+		/// Creates an operation that executes a set of other registered operations sequencially.
+		/// </summary>
+		/// <param name="operations">Operations.</param>
 		IOperation Chain(params string[] operations);
 
+		/// <summary>
+		/// Creates an operation that executes a set of other registered operations concurently.
+		/// </summary>
+		/// <param name="operations">Operations.</param>
 		IOperation Group(params string[] operations);
 
 		#endregion
@@ -81,6 +88,12 @@
 
 		#region Service
 
+		/// <summary>
+		/// Registers the specified service. This service must be decorated with specific attributes (ScheduledAttributes,
+		/// BehaviorAttributes, ...).
+		/// </summary>
+		/// <param name="service">Service.</param>
+		/// <typeparam name="TService">The 1st type parameter.</typeparam>
 		void Register<TService>(Func<TService> service);
 
 		#endregion

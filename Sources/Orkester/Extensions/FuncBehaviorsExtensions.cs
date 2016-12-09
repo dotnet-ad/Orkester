@@ -5,17 +5,17 @@
 	using System.Threading;
 	using System.Threading.Tasks;
 
-	public static class AsyncExtensions
+	public static class FuncBehaviorsExtensions
 	{
 
-		#region With one argument
+		#region Func with one argument
 
 		public static Func<TArg, CancellationToken, Task<T>> WithLock<TArg, T>(this Func<TArg, CancellationToken, Task<T>> func)
 		{
-			return func.WithMaxConcurrent(1);
+			return func.WithMaxConcurrency(1);
 		}
 
-		public static Func<TArg, CancellationToken, Task<T>> WithMaxConcurrent<TArg,T>(this Func<TArg, CancellationToken, Task<T>> func, int limit)
+		public static Func<TArg, CancellationToken, Task<T>> WithMaxConcurrency<TArg,T>(this Func<TArg, CancellationToken, Task<T>> func, int limit)
 		{
 			var semaphore = new SemaphoreSlim(limit);
 
@@ -43,9 +43,9 @@
 
 		public static Func<TArg, CancellationToken, Task<T>> WithTimeout<TArg,T>(this Func<TArg, CancellationToken, Task<T>> func, TimeSpan span)
 		{
-			return async (a,ct) =>
+			return async (a, ct) =>
 			{
-				var task = func(a,ct);
+				var task = func(a, ct);
 				var delay = Task.Delay(span, ct);
 
 				if (await Task.WhenAny(task, delay) == delay)
@@ -69,7 +69,7 @@
 
 			return (a,ct) =>
 			{
-				if (task == null)
+				if (task == null || task.IsCanceled || task.IsFaulted)
 				{
 					task = func(a,ct);
 				}
@@ -139,7 +139,7 @@
 
 		#endregion
 
-		#region Without args
+		#region Func without args
 
 		public static Func<CancellationToken, Task<T>> WithLock<T>(this Func<CancellationToken, Task<T>> func)
 		{
@@ -148,7 +148,7 @@
 
 		public static Func<CancellationToken, Task<T>> WithMaxConcurrent<T>(this Func<CancellationToken, Task<T>> func, int limit)
 		{
-			var op = WithMaxConcurrent<Void, T>((a, ct) => func(ct), limit);
+			var op = WithMaxConcurrency<Void, T>((a, ct) => func(ct), limit);
 			return (ct) => op(Void.Value, ct);
 		}
 

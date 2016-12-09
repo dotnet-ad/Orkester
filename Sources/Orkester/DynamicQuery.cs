@@ -10,6 +10,9 @@
 	/// </summary>
 	public class DynamicQuery : DynamicObject
 	{
+		/// <summary>
+		/// A query parameter that can be casted for parsing from string.
+		/// </summary>
 		public class Parameter
 		{
 			public Parameter(string value)
@@ -17,7 +20,13 @@
 				this.value = value;
 			}
 
+			#region Fields
+
 			private string value;
+
+			#endregion
+
+			#region Casts operators
 
 			public static implicit operator float(Parameter p)
 			{
@@ -54,6 +63,10 @@
 				return p.value;
 			}
 
+			#endregion
+
+			#region Parsing helpers
+
 			public T To<T>()
 			{
 				return this.value.Parse<T>();
@@ -63,6 +76,24 @@
 			{
 				return this.value.Parse(t);
 			}
+
+			private static Type[] SupportedTypes = new[] 
+			{ 
+				typeof(string),
+				typeof(int),
+				typeof(long),
+				typeof(float),
+				typeof(double),
+				typeof(bool),
+				typeof(DateTime),
+			};
+
+			public static bool IsSupported(Type t)
+			{
+				return SupportedTypes.Contains(t);
+			}
+
+			#endregion
 		}
 
 		#region Constructors
@@ -112,7 +143,14 @@
 			get { return dictionary.ToOrderedQueryString(); }
 		}
 
-		public Dictionary<string, Parameter> Values { get { return this.dictionary.ToDictionary((kvp) => kvp.Key, (kvp) => new Parameter(kvp.Value)); } }
+		/// <summary>
+		/// Gets the values in a dictionary
+		/// </summary>
+		/// <value>The values.</value>
+		public Dictionary<string, Parameter> Values 
+		{ 
+			get { return this.dictionary.ToDictionary((kvp) => kvp.Key, (kvp) => new Parameter(kvp.Value)); } 
+		}
 
 		#endregion
 

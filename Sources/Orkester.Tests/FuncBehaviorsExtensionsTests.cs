@@ -111,7 +111,7 @@ namespace Orkester.Tests
 				await f(ct);
 				Assert.Fail();
 			}
-			catch (OperationTimedOutException) { }
+			catch (OperationTimedOutException) {}
 		}
 
 		#endregion

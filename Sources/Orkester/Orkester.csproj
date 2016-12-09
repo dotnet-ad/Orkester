@@ -41,7 +41,7 @@
     <Compile Include="Void.cs" />
     <Compile Include="Exceptions\OperationTimedOutException.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
-    <Compile Include="Extensions\AsyncExtensions.cs" />
+    <Compile Include="Extensions\FuncBehaviorsExtensions.cs" />
     <Compile Include="IExecution.cs" />
     <Compile Include="Execution.cs" />
     <Compile Include="Services\ScheduledAttributes.cs" />
