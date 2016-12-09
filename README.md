@@ -1,3 +1,5 @@
+![Schema](./Doc/Logo-ld.png)
+
 # Orkester
 
 Lightweight framework for common centralized synchronization scenarios.
