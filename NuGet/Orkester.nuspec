@@ -16,6 +16,6 @@
    </metadata>
    <files>
      <file src="..\Sources\Orkester\bin\Release\Orkester.dll" target="lib\portable-net45+win8+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Orkester.dll" />
-     <file src="..\Sources\Orkester\bin\Release\Orkester.dll" target="lib\netstandard1.1\Orkester.dll">
+     <file src="..\Sources\Orkester\bin\Release\Orkester.dll" target="lib\netstandard1.1\Orkester.dll" />
    </files>
 </package>
