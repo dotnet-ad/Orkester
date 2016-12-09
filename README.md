@@ -23,10 +23,10 @@ Orkester supports  **.netstandard 1.1** and **PCL - Profile111**
 
 Available on NuGet
 
-[![NuGet](https://img.shields.io/nuget/v/Xam.Plugin.Battery.svg?label=NuGet)](https://www.nuget.org/packages/Orkester/)
+[![NuGet](https://img.shields.io/nuget/v/Orkester.svg?label=NuGet)](https://www.nuget.org/packages/Orkester/)
 
 ```shell
-PM> Install-Package Orkester
+PM> Install-Package Orkester -Pre
 ```
 
 ## Scheduler
