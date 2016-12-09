@@ -23,10 +23,10 @@ Orkester supports  **.netstandard 1.1** and **PCL - Profile111**
 
 Available on NuGet
 
-[![NuGet](https://img.shields.io/nuget/v/Orkester.svg?label=NuGet)](https://www.nuget.org/packages/Orkester/)
+[![NuGet](https://img.shields.io/nuget/v/Xam.Plugin.Battery.svg?label=NuGet)](https://www.nuget.org/packages/Orkester/)
 
 ```shell
-PM> Install-Package Orkester -Pre
+PM> Install-Package Orkester
 ```
 
 ## Scheduler
@@ -70,8 +70,7 @@ Special behavior can be applied to operations to create new ones.
 
 ![Schema](./Doc/WithRepeat.png)
 
-Repeats sequentially an asynchronous functiun a number of times.
-
+Repeats sequentially a task a number of times.
 
 ```csharp
 var op = Scheduler.Default.Create<int>(async (query,ct) => 
@@ -83,7 +82,7 @@ var op = Scheduler.Default.Create<int>(async (query,ct) =>
 //->  [ 21, 21, 21 ]
 ```
 
-##### WithMaxConcurrent
+##### WithMaxConcurrency
 
 ![Schema](./Doc/WithMaxConcurrent.png)
 
@@ -93,7 +92,7 @@ Executes the function with a maximum of concurent tasks at a given time.
 var op = Scheduler.Default.Create(async (query,ct) => 
 {
 	// ...
-}).WithMaxConcurrent(2);
+}).WithMaxConcurrency(2);
 ```
 
 ##### WithLock
@@ -119,7 +118,7 @@ Adds a timeout to a function execution : an exception is thrown in this case.
 var op = Scheduler.Default.Create(async (query,ct) => 
 {
 	// ...
-}).WithTimeout(Task.Delay(50));
+}).WithTimeout(TimeSpan.FromSeconds(10));
 ```
 
 ##### WithUniqueness
@@ -139,7 +138,7 @@ var op = Scheduler.Default.Create(async (query,ct) =>
 
 ![Schema](./Doc/WithCurrent.png)
 
-Returns the current task in one is beeing already executed.
+Returns the current task if one is beeing currently executed.
 
 ```csharp
 var op = Scheduler.Default.Create(async (query,ct) => 
@@ -158,7 +157,7 @@ Returns the result of the last execution until it expires.
 var op = Scheduler.Default.Create(async (query,ct) => 
 {
 	// ...
-}).WithExpiration(100); 
+}).WithExpiration(TimeSpan.FromMinutes(5)); 
 
 ```
 
@@ -172,7 +171,7 @@ Wait a period before starting the task, and aggregate all requested execution du
 var op = Scheduler.Default.Create(async (query,ct) => 
 {
 	// ...
-}).WithAggregation(100);
+}).WithAggregation(TimeSpan.FromMinutes(5));
 ```
 
 ### Registration
@@ -189,9 +188,9 @@ Scheduler.Default.Create<int>(async (query, ct) =>
 }).WithUniqueness().Save("/name");
 ```
 
-### Groups and chains
+### Combinations
 
-As soon as you get you operations registered, groups and chain can be registered.
+As soon as you get you operations registered, groups and chain can be registered too combine those operations. When executing a group, query parameters will be passed to all children operations. The combination operations have no result.
 
 #### Groups
 
