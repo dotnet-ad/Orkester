@@ -1,7 +1,9 @@
 ﻿namespace Orkester
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Dynamic;
+	using System.Linq;
 
 	/// <summary>
 	/// A query string as a dynamic object for accessing query parameters.
@@ -17,24 +19,49 @@
 
 			private string value;
 
+			public static implicit operator float(Parameter p)
+			{
+				return p.To<float>();
+			}
+
 			public static implicit operator double(Parameter p)
 			{
-				return double.Parse(p.value);
+				return p.To<double>();
 			}
 
 			public static implicit operator int(Parameter p)
 			{
-				return int.Parse(p.value);
+				return p.To<int>();
+			}
+
+			public static implicit operator long(Parameter p)
+			{
+				return p.To<long>();
 			}
 
 			public static implicit operator bool(Parameter p)
 			{
-				return bool.Parse(p.value);
+				return p.To<bool>();
+			}
+
+			public static implicit operator DateTime(Parameter p)
+			{
+				return p.To<DateTime>();
 			}
 
 			public static implicit operator string(Parameter p)
 			{
 				return p.value;
+			}
+
+			public T To<T>()
+			{
+				return this.value.Parse<T>();
+			}
+
+			public object To(Type t)
+			{
+				return this.value.Parse(t);
 			}
 		}
 
@@ -84,6 +111,8 @@
 		{
 			get { return dictionary.ToOrderedQueryString(); }
 		}
+
+		public Dictionary<string, Parameter> Values { get { return this.dictionary.ToDictionary((kvp) => kvp.Key, (kvp) => new Parameter(kvp.Value)); } }
 
 		#endregion
 

@@ -42,10 +42,15 @@
     <Compile Include="Exceptions\OperationTimedOutException.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Extensions\AsyncExtensions.cs" />
+    <Compile Include="IExecution.cs" />
+    <Compile Include="Execution.cs" />
+    <Compile Include="Services\ScheduledAttributes.cs" />
+    <Compile Include="Extensions\ParseExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

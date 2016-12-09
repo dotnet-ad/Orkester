@@ -8,124 +8,123 @@ Lightweight framework for common centralized synchronization scenarios.
 
 Soon on NuGet ...
 
-## Asynchronous extensions
+## Scheduler
 
-The heart of Orkester are its very fluent basic extension function for asynchronous functions. Very complex synchronization scenarios are implemented gracefuly as simple functions thanks to lambda compiled generated classes.
+The Scheduler is a centralized place to request asynchronous operations from strings.
 
-### WithRepeat
+Abstraction of a request is represented easily and some behaviors can be added to registered asynchronous operations.
+
+### Operations
+
+An operation is nothing more than a `Task` factory for the Scheduler.
+
+#### Creation
+
+To instanciate operations, the easier way is `Scheduler.Create`.
+
+##### Without result
+
+```csharp
+var operation = Scheduler.Default.Create(async (query, ct) => 
+{ 
+	await Task.Delay(10);
+});
+```
+
+##### With result
+
+```csharp
+var operation = Scheduler.Default.Create<int>(async (query, ct) => 
+{ 
+	await Task.Delay(10);
+	return 5;
+});
+```
+
+#### Behaviors
+
+Special behavior can be applied to operations to create new ones.
+
+##### WithRepeat
 
 ![Schema](./Doc/WithRepeat.png)
 
 Repeats sequentially an asynchronous functiun a number of times.
 
+
 ```csharp
-Func<CancellationToken, Task<int>> func = async (ct) => 
+var op = Scheduler.Default.Create<int>(async (query,ct) => 
 {
 	await Task.Delay(100);
 	return 21;
-};
+}).WithRepeat(3); 
 
-var re = func.WithRepeat(2);
-
-var results = await re(ct); // [ 21, 21 ]
+//->  [ 21, 21, 21 ]
 ```
 
-### WithMaxConcurrent
+##### WithMaxConcurrent
 
 ![Schema](./Doc/WithMaxConcurrent.png)
 
 Executes the function with a maximum of concurent tasks at a given time.
 
 ```csharp
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-};
-
-var co = func.WithMaxConcurrent(2); 
-
-await Task.WhenAll(co(ct), co(ct), co(ct)); // -> 200 ms
-
+	// ...
+}).WithMaxConcurrent(2);
 ```
 
-### WithLock
+##### WithLock
 
 ![Schema](./Doc/WithLock.png)
 
 Executes the function with a maximum of one concurent task at a given time.
 
 ```csharp
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-};
-
-var co = func.WithLock(); 
-
-await Task.WhenAll(co(ct), co(ct), co(ct)); // -> 300 ms
-
+	// ...
+}).WithLock();
 ```
 
-### WithTimeout
+##### WithTimeout
 
 ![Schema](./Doc/WithTimeout.png)
 
 Adds a timeout to a function execution : an exception is thrown in this case.
 
 ```csharp
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-};
-
-var to = func.WithTimeout(Task.Delay(50)); 
-
-await to(ct); // -> Thrown
-
+	// ...
+}).WithTimeout(Task.Delay(50));
 ```
 
-### WithUniqueness
+##### WithUniqueness
 
 ![Schema](./Doc/WithUniqueness.png)
 
 Executes the function only one time and caches its task for later execution requests.
 
 ```csharp
-int count = 0;
-
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-	count++;
-};
-
-var un = func.WithUniqueness(); 
-
-await to(ct); // count == 1
-await to(ct); // count == 1
-
+	// ...
+}).WithUniqueness();
 ```
 
-### WithCurrent
+##### WithCurrent
 
 ![Schema](./Doc/WithCurrent.png)
 
 Returns the current task in one is beeing already executed.
 
 ```csharp
-int count = 0;
-
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-	count++;
-};
-
-var cu = func.WithCurrent(); 
-
-await Task.WhenAll(cu(ct),cu(ct)); // count == 1
-await cu(ct); // count == 2
-
+	// ...
+}.WithCurrent();
 ```
 
 ### WithExpiration
@@ -135,85 +134,36 @@ await cu(ct); // count == 2
 Returns the result of the last execution until it expires.
 
 ```csharp
-int count = 0;
-
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-	count++;
-};
-
-var ex = func.WithExpiration(100); 
-
-await ex(ct); // count == 1 (-)
-await ex(ct); // count == 1 (0ms)
-await ex(ct); // count == 2 (100ms -> expired)
+	// ...
+}).WithExpiration(100); 
 
 ```
 
-### WithAggregation
+##### WithAggregation
 
 ![Schema](./Doc/WithAggregation.png)
 
 Wait a period before starting the task, and aggregate all requested execution during this one to return only one task.
 
 ```csharp
-int count = 0;
-
-Func<CancellationToken, Task> func = async (ct) => 
+var op = Scheduler.Default.Create(async (query,ct) => 
 {
-	await Task.Delay(100);
-	count++;
-};
-
-var ex = func.WithAggregation(100); 
-
-var t1 = ex(ct);
-await Task.Delay(50);
-var t2 = ex(ct);
-await Task.Delay(100);
-var t3 = ex(ct);
-
-await Task.WhenAll(t1,t2,t3); // count == 2
-
+	// ...
+}).WithAggregation(100);
 ```
-
-## Scheduler
-
-The Scheduler adds a centralized place to request asynchronous operations from string queries.
-
-Abstraction of a request is represented easily as query and each asynchronous extension can be used.
-
 
 ### Registration
 
-#### `Task`
-
-```csharp
-Scheduler.Default.Create(async (query, ct) => 
-{ 
-	await Task.Delay(10);
-}).Save("/void");
-```
-
-#### `Task<T>`
+All operations must be registred into the Scheduler to be able to be queried later. To achieve this, operation's `Save` method can be used.
 
 ```csharp
 Scheduler.Default.Create<int>(async (query, ct) => 
 { 
 	await Task.Delay(10);
 	return 5;
-}).Save("/withresult");
-```
-
-#### Async extensions
-
-```csharp
-Scheduler.Default.Create<int>(async (query, ct) => 
-{ 
-	await Task.Delay(10);
-	return 5;
-}).WithUniqueness().Save("/unique");
+}).WithUniqueness().Save("/name");
 ```
 
 ### Invocation
@@ -278,6 +228,56 @@ Assert.AreEqual(6,count);
 
 ```
 
+### Services
+
+If you have multiple operations you would like to register, you can simplify your code by declaring a service. A service is basically a class that declares asynchronous methods with special attributes for paths, params and behaviors.
+
+```csharp
+[Scheduled("/example")]
+public class ExampleService
+{
+	public int Count { get; set; }
+	
+	[Scheduled("/add")]
+	[WithUniqueness]
+	public async Task<int> Add(int a, int b, CancellationToken token)
+	{
+		await Task.Delay(100,token);
+		Count += a + b;
+		return Count;
+	}
+}
+```
+
+You can then register all its operations to your scheduler.
+
+```csharp
+var service = new ExampleService();
+Scheduler.Default.Register(() => service);
+```
+
+And now you're able to execute operations by querying the scheduler.
+
+```csharp
+var count = await Scheduler.Default.ExecuteAsync<int>("/example/add?a=1&b=2");
+```
+
+## Asynchronous extensions
+
+The heart of Orkester are its set of very fluent basic extension functions for asynchronous functions. Very complex synchronization scenarios are implemented gracefuly as simple functions thanks to lambda compiled generated classes. Each one of operation behaviors can be also called from simple `Func` with extensions.
+
+```csharp
+Func<CancellationToken, Task<int>> func = async (ct) => 
+{
+	await Task.Delay(100);
+	return 21;
+};
+
+var re = func.WithRepeat(2);
+
+var results = await re(ct); // [ 21, 21 ]
+```
+
 ## Roadmap / Ideas
 
 * Add more extensions
@@ -286,7 +286,7 @@ Assert.AreEqual(6,count);
 
 ## About
 
-Feel free to add an issue or pull request if you have any idea or bug.
+Feel free to add an issue or pull request if you have any idea or found a bug.
 
 ### License
 

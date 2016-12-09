@@ -9,12 +9,6 @@
 	public interface IExecution
 	{
 		/// <summary>
-		/// Indicates whether the execution is finished.
-		/// </summary>
-		/// <value>The is finished.</value>
-		bool IsFinished { get; }
-
-		/// <summary>
 		/// Gets the start date.
 		/// </summary>
 		/// <value>The start date.</value>
@@ -27,22 +21,23 @@
 		DateTime? EndDate { get; }
 
 		/// <summary>
-		/// Gets the operation representation.
-		/// </summary>
-		/// <value>The operation.</value>
-		IOperation Operation { get; }
-
-		/// <summary>
-		/// Gets the query parameters.
+		/// Gets or sets the executed query.
 		/// </summary>
 		/// <value>The query.</value>
-		DynamicQuery Query { get; }
+		string Query { get; }
 
 		/// <summary>
 		/// Gets the asynchronous task associated to this execution.
 		/// </summary>
 		/// <value>The task.</value>
 		Task Task { get; }
+
+		/// <summary>
+		/// Gets the result if Task has one.
+		/// </summary>
+		/// <returns>The result.</returns>
+		/// <typeparam name="T">The 1st type parameter.</typeparam>
+		Task<T> AsTask<T>();
 	}
 }
 
